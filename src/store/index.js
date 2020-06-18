@@ -8,26 +8,48 @@ export default new Vuex.Store({
   state: {
     list: [],
     inputValue: '',
-    id: 0
+    nextId: 0
   },
   mutations: {
     initList (state, list) {
       state.list = list
     },
     initId (state, id) {
-      state.id = id
+      state.nextId = id
     },
     setInputValue (state, newValue) {
       state.inputValue = newValue
     },
     addToList (state, info) {
       state.list.push({
-        id: state.id,
+        id: state.nextId,
         info: info,
         done: false
       })
-      state.id++
+      state.nextId++
       state.inputValue = ''
+    },
+    deleteFromList (state, id) {
+      const index = state.list.findIndex(item => {
+        return item.id === id
+      })
+      if (index !== -1) {
+        state.list.splice(index, 1)
+      }
+    },
+    updateStatus (state, params) {
+      const index = state.list.findIndex(item => {
+        return item.id === params.id
+      })
+
+      if (index !== -1) { state.list[index].done = params.status }
+    },
+    deleteDones (state) {
+      console.log('!!!')
+
+      state.list = state.list.filter(item => {
+        return item.done === false
+      })
     }
   },
   actions: {
@@ -36,6 +58,13 @@ export default new Vuex.Store({
         context.commit('initList', data)
         context.commit('initId', data[data.length - 1].id + 1)
       })
+    }
+  },
+  getters: {
+    getUndoneCount (state) {
+      return state.list.filter(item => {
+        return item.done === false
+      }).length
     }
   }
 })

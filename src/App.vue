@@ -6,15 +6,15 @@
     <a-list bordered :dataSource="list" class="dt_list">
       <a-list-item slot="renderItem" slot-scope="item">
         <!-- 复选框 -->
-        <a-checkbox>{{item.info}}</a-checkbox>
+        <a-checkbox :checked="item.done" @change="(e) => {handleCheckBoxChanged(e, item.id)}">{{item.info}}</a-checkbox>
         <!-- 删除链接 -->
-        <a slot="actions">删除</a>
+        <a slot="actions" @click="deleteItemFromList(item.id)">删除</a>
       </a-list-item>
 
       <!-- footer区域 -->
       <div slot="footer" class="footer">
         <!-- 未完成的任务个数 -->
-        <span>0条剩余</span>
+        <span>{{getUndoneCount}}条剩余</span>
         <!-- 操作按钮 -->
         <a-button-group>
           <a-button type="primary">全部</a-button>
@@ -22,14 +22,14 @@
           <a-button>已完成</a-button>
         </a-button-group>
         <!-- 把已经完成的任务清空 -->
-        <a>清除已完成</a>
+        <a @click="deleteDoneItems">清除已完成</a>
       </div>
     </a-list>
   </div>
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 export default {
   name: 'app',
   data () {
@@ -48,10 +48,23 @@ export default {
     addItemToList () {
       if (this.inputValue.trim().length === 0) return this.$message.warning('Input cannot be empty')
       this.$store.commit('addToList', this.inputValue.trim())
+    },
+    deleteItemFromList (id) {
+      this.$store.commit('deleteFromList', id)
+    },
+    handleCheckBoxChanged (e, id) {
+      this.$store.commit('updateStatus', {
+        id: id,
+        status: e.target.checked
+      })
+    },
+    deleteDoneItems () {
+      this.$store.commit('deleteDones')
     }
   },
   computed: {
-    ...mapState(['list', 'inputValue'])
+    ...mapState(['list', 'inputValue']),
+    ...mapGetters(['getUndoneCount'])
   }
 }
 </script>
