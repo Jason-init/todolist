@@ -8,7 +8,8 @@ export default new Vuex.Store({
   state: {
     list: [],
     inputValue: '',
-    nextId: 0
+    nextId: 0,
+    activeList: 'all'
   },
   mutations: {
     initList (state, list) {
@@ -45,11 +46,12 @@ export default new Vuex.Store({
       if (index !== -1) { state.list[index].done = params.status }
     },
     deleteDones (state) {
-      console.log('!!!')
-
       state.list = state.list.filter(item => {
         return item.done === false
       })
+    },
+    changeActiveList (state, activeList) {
+      state.activeList = activeList
     }
   },
   actions: {
@@ -65,6 +67,19 @@ export default new Vuex.Store({
       return state.list.filter(item => {
         return item.done === false
       }).length
+    },
+    getListByActiveList (state) {
+      if (state.activeList === 'all') return state.list
+      else if (state.activeList === 'undone') {
+        return state.list.filter(item => {
+          return item.done === false
+        })
+      } else if (state.activeList === 'done') {
+        return state.list.filter(item => {
+          return item.done === true
+        })
+      }
+      return state.list
     }
   }
 })

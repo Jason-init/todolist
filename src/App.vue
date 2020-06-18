@@ -3,7 +3,7 @@
     <a-input placeholder="请输入任务" class="my_ipt" :value="inputValue" @change="handleInputChange"/>
     <a-button type="primary" @click="addItemToList">添加事项</a-button>
 
-    <a-list bordered :dataSource="list" class="dt_list">
+    <a-list bordered :dataSource="getListByActiveList" class="dt_list">
       <a-list-item slot="renderItem" slot-scope="item">
         <!-- 复选框 -->
         <a-checkbox :checked="item.done" @change="(e) => {handleCheckBoxChanged(e, item.id)}">{{item.info}}</a-checkbox>
@@ -17,9 +17,9 @@
         <span>{{getUndoneCount}}条剩余</span>
         <!-- 操作按钮 -->
         <a-button-group>
-          <a-button type="primary">全部</a-button>
-          <a-button>未完成</a-button>
-          <a-button>已完成</a-button>
+          <a-button :type="activeList === 'all' ? 'primary' : 'default'" @click="switchList('all')">全部</a-button>
+          <a-button :type="activeList === 'undone' ? 'primary' : 'default'" @click="switchList('undone')">未完成</a-button>
+          <a-button :type="activeList === 'done' ? 'primary' : 'default'" @click="switchList('done')">已完成</a-button>
         </a-button-group>
         <!-- 把已经完成的任务清空 -->
         <a @click="deleteDoneItems">清除已完成</a>
@@ -34,7 +34,6 @@ export default {
   name: 'app',
   data () {
     return {
-
     }
   },
   created () {
@@ -60,11 +59,14 @@ export default {
     },
     deleteDoneItems () {
       this.$store.commit('deleteDones')
+    },
+    switchList (activeList) {
+      this.$store.commit('changeActiveList', activeList)
     }
   },
   computed: {
-    ...mapState(['list', 'inputValue']),
-    ...mapGetters(['getUndoneCount'])
+    ...mapState(['list', 'inputValue', 'activeList']),
+    ...mapGetters(['getUndoneCount', 'getListByActiveList'])
   }
 }
 </script>
